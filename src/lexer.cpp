@@ -6,6 +6,9 @@
 
 #include "lexer.hpp"
 
+std::string identifier_str;
+double num_val;
+
 /*!
  * @brief This function is called to return the next token from standard
  *          input.

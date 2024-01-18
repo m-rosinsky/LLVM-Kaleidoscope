@@ -10,8 +10,8 @@
 #include <string>
 
 // Globals.
-std::string identifier_str;  // Filled in if tok_identifier.
-double num_val;              // Filled in if tok_number.
+extern std::string identifier_str;  // Filled in if tok_identifier.
+extern double num_val;              // Filled in if tok_number.
 
 /*!
  * @brief This enum contains the types of tokens.
