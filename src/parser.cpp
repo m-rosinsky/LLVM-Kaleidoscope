@@ -45,30 +45,6 @@ get_next_token()
 }
 
 /*!
- * @brief This function is a helper function for error handling.
- *
- * @param p_str The error message to print.
- */
-std::unique_ptr<ExprAST>
-log_error (const char * p_str)
-{
-    fprintf(stderr, "Error: %s\n", p_str);
-    return nullptr;
-}
-
-/*!
- * @brief This function is a helper function for prototype error handling.
- *
- * @param p_str The error message to print.
- */
-std::unique_ptr<PrototypeAST>
-log_error_p (const char * p_str)
-{
-    log_error(p_str);
-    return nullptr;
-}
-
-/*!
  * @brief This function parses variable references and function calls.
  *
  * @return Pointer to an AST expression.

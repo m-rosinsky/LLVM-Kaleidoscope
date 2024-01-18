@@ -7,9 +7,27 @@
 #ifndef _LLVM_AST_H
 #define _LLVM_AST_H
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/Verifier.h"
+
+extern std::unique_ptr<llvm::LLVMContext> g_context;
+extern std::unique_ptr<llvm::IRBuilder<>> g_builder;
+extern std::unique_ptr<llvm::Module> g_module;
+extern std::map<std::string, llvm::Value *> g_named_values;
 
 /*!
  * @brief This class is the base class for all expression nodes.
@@ -19,6 +37,9 @@ class ExprAST
 public:
     // Virtual destructor.
     virtual ~ExprAST() = default;
+
+    // Pure virtual codegen function.
+    virtual llvm::Value * codegen() = 0;
 };
 
 /*!
@@ -36,6 +57,8 @@ public:
         : val(0.0) {}
     NumberExprAST(double val)
         : val(val) {}
+
+    llvm::Value * codegen() override;
 };
 
 /*!
@@ -53,6 +76,8 @@ public:
         : name("") {}
     VariableExprAST(const std::string& name)
         : name(name) {}
+
+    llvm::Value * codegen() override;
 };
 
 /*!
@@ -73,6 +98,8 @@ public:
                   std::unique_ptr<ExprAST> lhs,
                   std::unique_ptr<ExprAST> rhs)
         : op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+
+    llvm::Value * codegen() override;
 };
 
 /*!
@@ -88,6 +115,8 @@ public:
     CallExprAST(const std::string& callee,
                 std::vector<std::unique_ptr<ExprAST>> args)
         : callee(callee), args(std::move(args)) {}
+
+    llvm::Value * codegen() override;
 };
 
 /*!
@@ -108,6 +137,8 @@ public:
         : name(name), args(std::move(args)) {}
 
     const std::string& get_name() const noexcept { return name; }
+
+    llvm::Function * codegen();
 };
 
 /*!
@@ -123,7 +154,25 @@ public:
     FunctionAST(std::unique_ptr<PrototypeAST> proto,
                 std::unique_ptr<ExprAST> body)
         : proto(std::move(proto)), body(std::move(body)) {}
+
+    llvm::Function * codegen();
 };
+
+/*!
+ * @brief This function is a helper function for error handling.
+ *
+ * @param p_str The error message to print.
+ */
+std::unique_ptr<ExprAST>
+log_error (const char * p_str);
+
+/*!
+ * @brief This function is a helper function for prototype error handling.
+ *
+ * @param p_str The error message to print.
+ */
+std::unique_ptr<PrototypeAST>
+log_error_p (const char * p_str);
 
 #endif // _LLVM_AST_H
 

@@ -2,7 +2,10 @@
 CC = clang++
 
 # Compiler flags.
-CFLAGS = -Wall -Wextra -pedantic -std=c++14
+CFLAGS = -w -std=c++14
+
+# LLVM linkage flags.
+LLVM_FLAGS = `llvm-config --cxxflags --ldflags --system-libs --libs core`
 
 # Object dir.
 OBJS = objs
@@ -33,10 +36,13 @@ setup:
 compile: setup
 	@echo "Compiling sources..."
 
-	@$(CC) $(CFLAGS) -o $(OBJS)/lexer.o -c $(SRCS)/lexer.cpp
+	@$(CC) $(CFLAGS) $(LLVM_FLAGS) -o $(OBJS)/ast.o -c $(SRCS)/ast.cpp
+	@echo "  [+] Compiled $(OBJS)/ast.o"
+
+	@$(CC) $(CFLAGS) $(LLVM_FLAGS) -o $(OBJS)/lexer.o -c $(SRCS)/lexer.cpp
 	@echo "  [+] Compiled $(OBJS)/lexer.o"
 
-	@$(CC) $(CFLAGS) -o $(OBJS)/parser.o -c $(SRCS)/parser.cpp
+	@$(CC) $(CFLAGS) $(LLVM_FLAGS) -o $(OBJS)/parser.o -c $(SRCS)/parser.cpp
 	@echo "  [+] Compiled $(OBJS)/parser.o"
 
 	@echo "done"
@@ -44,7 +50,7 @@ compile: setup
 link: setup compile
 	@echo "Linking binaries..."
 
-	@$(CC) $(CFLAGS) -o $(BINS)/kaleidoscope $(SRCS)/main.cpp $(OBJS)/*.o
+	@$(CC) $(CFLAGS) $(LLVM_FLAGS) -o $(BINS)/kaleidoscope $(SRCS)/main.cpp $(OBJS)/*.o
 	@echo "  [+] Linked $(BINS)/kaleidoscope"
 
 	@echo "done"
